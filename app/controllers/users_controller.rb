@@ -10,6 +10,12 @@ class UsersController < ApplicationController
   # GET /users/1
   # GET /users/1.json
   def show
+    if logged_in?
+      @user = User.find(params[:id])
+    else
+      flash[:notice] = "You need to log in."
+      redirect_to login_path
+    end
   end
 
   # GET /users/new

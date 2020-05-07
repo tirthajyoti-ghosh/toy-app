@@ -10,8 +10,8 @@
   <%= @user.email %>
 </p>
 
-<p>First Micropost</p>
-<p><%= @user.microposts.first.content %></p>
+<%= link_to "Log out", logout_path, method: :delete %>
+<br>
 
 <%= link_to 'Edit', edit_user_path(@user) %> |
 <%= link_to 'Back', users_path %>
