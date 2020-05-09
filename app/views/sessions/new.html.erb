@@ -8,6 +8,9 @@
       <%= f.email_field :email, class: 'form-control' %>
       <%= f.label :password %>
       <%= f.password_field :password, class: 'form-control' %>
+      <%= f.label :remember_me do %>
+        <%= f.check_box :remember_me %> <span>Remember me</span>
+      <% end %>
       <%= f.submit "Log in", class: "btn btn-primary" %>
     <% end %>
     <p>New user? <%= link_to "Sign up now!", '#' %></p>
