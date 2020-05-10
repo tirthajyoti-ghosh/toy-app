@@ -11,7 +11,7 @@ class UsersController < ApplicationController
   # GET /users/1.json
   def show
     if logged_in?
-      @user = User.find(params[:id])
+      @user
     else
       flash[:notice] = "You need to log in."
       redirect_to login_path
@@ -25,6 +25,12 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
+    if logged_in?
+      @user
+    else
+      flash[:notice] = "You need to log in."
+      redirect_to login_path
+    end
   end
 
   # POST /users
@@ -46,14 +52,11 @@ class UsersController < ApplicationController
   # PATCH/PUT /users/1
   # PATCH/PUT /users/1.json
   def update
-    respond_to do |format|
-      if @user.update(user_params)
-        format.html { redirect_to @user, notice: 'User was successfully updated.' }
-        format.json { render :show, status: :ok, location: @user }
-      else
-        format.html { render :edit }
-        format.json { render json: @user.errors, status: :unprocessable_entity }
-      end
+    if @user.update(user_params)
+      flash[:notice] = "Profile updated"
+      redirect_to @user
+    else
+      render 'edit'
     end
   end
 
@@ -75,6 +78,6 @@ class UsersController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def user_params
-      params.require(:user).permit(:name, :email)
+      params.require(:user).permit(:name, :email, :password, :password_confirmation)
     end
 end
