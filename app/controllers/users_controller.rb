@@ -1,21 +1,18 @@
 class UsersController < ApplicationController
-  before_action :set_user, only: [:show, :edit, :update, :destroy]
+  before_action :set_user, only: [:show, :edit, :update, :destroy, :correct_user]
+  before_action :logged_in_user, only: [:edit, :update, :destroy]
+  before_action :correct_user, only: [:edit, :update, :destroy]
+  before_action :admin_user, only: [:edit, :update, :destroy]
 
   # GET /users
   # GET /users.json
   def index
-    @users = User.all
+    @users = User.paginate(page: params[:page])
   end
 
   # GET /users/1
   # GET /users/1.json
   def show
-    if logged_in?
-      @user
-    else
-      flash[:notice] = "You need to log in."
-      redirect_to login_path
-    end
   end
 
   # GET /users/new
@@ -25,12 +22,6 @@ class UsersController < ApplicationController
 
   # GET /users/1/edit
   def edit
-    if logged_in?
-      @user
-    else
-      flash[:notice] = "You need to log in."
-      redirect_to login_path
-    end
   end
 
   # POST /users
@@ -40,6 +31,7 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if @user.save
+        log_in @user
         format.html { redirect_to @user, notice: 'User was successfully created.' }
         format.json { render :show, status: :created, location: @user }
       else
@@ -71,13 +63,36 @@ class UsersController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_user
-      @user = User.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def user_params
-      params.require(:user).permit(:name, :email, :password, :password_confirmation)
+  # Use callbacks to share common setup or constraints between actions.
+  def set_user
+    @user = User.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def user_params
+    params.require(:user).permit(:name, :email, :password, :password_confirmation)
+  end
+
+  # Before filters
+
+  # Confirms a logged in user
+  def logged_in_user
+    unless logged_in?
+      store_location
+      flash[:notice] = "You need to log in."
+      redirect_to login_path
     end
+  end
+
+  # Confirms the correct user
+  def correct_user
+    return true if current_user.admin?
+    redirect_to root_path unless current_user?(@user)
+  end
+
+  # Confirms an admin user
+  def admin_user
+    redirect_to(root_url) unless current_user.admin?
+  end
 end

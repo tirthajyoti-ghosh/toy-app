@@ -1,4 +1,8 @@
+<% provide(:title, "All Users") %>
+
 <p id="notice"><%= notice %></p>
+
+<%= will_paginate %>
 
 <h1>Users</h1>
 <% if logged_in? %>
@@ -16,20 +20,12 @@
 
   <tbody>
     <% @users.each do |user| %>
-      <tr>
-        <td><%= user.name %></td>
-        <td><%= user.email %></td>
-
-        <% if logged_in? %>
-          <td><%= link_to 'Show', user %></td>
-          <td><%= link_to 'Edit', edit_user_path(user) %></td>
-          <td><%= link_to 'Destroy', user, method: :delete, data: { confirm: 'Are you sure?' } %></td>
-        <% end %>
-        
-      </tr>
+      <%= render user %>
     <% end %>
   </tbody>
 </table>
+
+<%= will_paginate %>
 
 <br>
 
@@ -37,4 +33,8 @@
 <br>
 <%= link_to 'New User', new_user_path %>
 <br>
-<%= link_to 'Login', login_path %>
+<% if logged_in? %>
+  <%= link_to "Log out", logout_path, method: :delete %>
+<% else %>
+  <%= link_to 'Login', login_path %>
+<% end %>
