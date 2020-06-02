@@ -10,11 +10,11 @@
   <%= @user.email %>
 </p>
 
-<%= link_to "Log out", logout_path, method: :delete %>
 <br>
 
 <% if logged_in? %>
-  <%= link_to 'Edit', edit_user_path(@user) %> |
+  <%= link_to 'Edit', edit_user_path(@user) %> | 
+  <%= link_to "Log out", logout_path, method: :delete %>
 <% end %>
-
+<br>
 <%= link_to 'Back', users_path %>
