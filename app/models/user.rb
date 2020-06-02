@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   attr_accessor :remember_token
 
+  has_many :microposts, dependent: :destroy
+
   before_save { email.downcase! }
 
   validates :name, presence: true, 

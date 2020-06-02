@@ -1,10 +1,12 @@
 class MicropostsController < ApplicationController
-  before_action :set_micropost, only: [:show, :edit, :update, :destroy]
+  before_action :set_micropost, only: [:show, :edit, :update, :destroy, :correct_user]
+  before_action :log_in, except: [:show, :index]
+  before_action :correct_user, only: [:edit, :update, :destroy]
 
   # GET /microposts
   # GET /microposts.json
   def index
-    @microposts = Micropost.all
+    @microposts = Micropost.includes(:user).all
   end
 
   # GET /microposts/1
@@ -14,7 +16,7 @@ class MicropostsController < ApplicationController
 
   # GET /microposts/new
   def new
-    @micropost = Micropost.new
+    @micropost = current_user.microposts.new
   end
 
   # GET /microposts/1/edit
@@ -24,7 +26,7 @@ class MicropostsController < ApplicationController
   # POST /microposts
   # POST /microposts.json
   def create
-    @micropost = Micropost.new(micropost_params)
+    @micropost = current_user.microposts.new(micropost_params)
 
     respond_to do |format|
       if @micropost.save
@@ -62,13 +64,28 @@ class MicropostsController < ApplicationController
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_micropost
-      @micropost = Micropost.find(params[:id])
-    end
 
-    # Only allow a list of trusted parameters through.
-    def micropost_params
-      params.require(:micropost).permit(:content, :user_id)
+  # Use callbacks to share common setup or constraints between actions.
+  def set_micropost
+    @micropost = Micropost.find(params[:id])
+  end
+
+  # Only allow a list of trusted parameters through.
+  def micropost_params
+    params.require(:micropost).permit(:content)
+  end
+
+  # Enforce log in
+  def log_in
+    unless logged_in?
+      store_location
+      redirect_to login_path, notice: 'You must login to create new post.'
     end
+  end
+
+  # Confirms the correct user
+  def correct_user
+    return true if current_user.admin?
+    redirect_to root_path unless current_user?(@user)
+  end
 end
